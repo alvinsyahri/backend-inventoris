@@ -4,11 +4,10 @@ const { ObjectId } = mongoose.Schema;
 const peminjamanSchema = new mongoose.Schema({
     tanggalPinjam: {
         type: Date,
-        required: true
+        default: Date.now
     },
     tanggalKembali: {
         type: Date,
-        required: true
     },
     keterangan: {
         type: String,
@@ -18,10 +17,10 @@ const peminjamanSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'User'
     },
-    detailPeminjamanId: [{
+    barangId: {
         type: ObjectId,
-        ref: 'DetailPeminjaman'
-    }],
+        ref: 'Barang'
+    },
     createdAt: {
         type: Date,
         default: Date.now 

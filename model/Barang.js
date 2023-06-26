@@ -8,7 +8,7 @@ const barangSchema = new mongoose.Schema({
     },
     dekripsi: {
         type: String,
-       required: true 
+        required: true 
     },
     serialNumber: {
         type: String,
@@ -34,9 +34,9 @@ const barangSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Category'
     },
-    detailPeminjamanId: [{
+    peminjamanId: [{
         type: ObjectId,
-        ref: 'DetailPeminjaman'
+        ref: 'Peminjaman'
     }],
     createdAt: {
         type: Date,
