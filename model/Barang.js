@@ -6,7 +6,7 @@ const barangSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    dekripsi: {
+    deskripsi: {
         type: String,
         required: true 
     },
@@ -23,16 +23,18 @@ const barangSchema = new mongoose.Schema({
        required: true 
     },
     keterangan: {
-        type: String,
-       required: true 
+        type: String, 
     },
     kondisi: {
         type: String,
-       required: true 
     },
     categoryId: {
         type: ObjectId,
         ref: 'Category'
+    },
+    status:{
+        type: Boolean,
+        default: false
     },
     peminjamanId: [{
         type: ObjectId,

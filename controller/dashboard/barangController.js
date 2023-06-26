@@ -1,4 +1,5 @@
 const Barang = require('../../model/Barang');
+const Category = require('../../model/Category');
 
 module.exports = {
 
@@ -7,7 +8,7 @@ module.exports = {
             const barang = await Barang.find().sort({ createdAt: -1 });
             res.status(200).json({
                 'status' : "Success",
-                'data' : category
+                'data' : barang
             });
         } catch (error) {
             res.status(400).json({
@@ -19,7 +20,20 @@ module.exports = {
     addBarang : async(req, res) => {
         try {
             const { kode, deskripsi, serialNumber, lokasi, tahun, keterangan, kondisi,  categoryId} = req.body;
-            await Category.create({name})
+            const newBarang = {
+                kode,
+                deskripsi,
+                serialNumber,
+                lokasi,
+                tahun,
+                keterangan,
+                kondisi,
+                categoryId
+            }
+            const barang = await Barang.create(newBarang);
+            const category = await Category.findOne({ _id: categoryId});
+            category.barangId.push({ _id: barang._id})
+            category.save()
             res.status(200).json({
                 'status' : "SuccesS"
             })
@@ -32,16 +46,24 @@ module.exports = {
     },
     editBarang : async(req, res) => {
         try {
-            const { id, name } = req.body;
+            const { id, kode, deskripsi, serialNumber, lokasi, tahun, keterangan, kondisi,  categoryId } = req.body;
             const updatedAt = new Date()
-            const category =  await Category.findOne({ _id: id})
-            category.name = name;
-            category.updatedAt = updatedAt;
-            await category.save();
+            const barang =  await Barang.findOne({ _id: id})
+            barang.kode = kode;
+            barang.deskripsi = deskripsi,
+            barang.serialNumber = serialNumber,
+            barang.lokasi = lokasi,
+            barang.tahun = tahun,
+            barang.keterangan = keterangan,
+            barang.kondisi = kondisi,
+            barang.categoryId = categoryId,
+            barang.updatedAt = updatedAt
+            await barang.save();
             res.status(200).json({
                 'status' : "SuccesS Edit"
             })
         } catch (error) {
+            console.log(error)
             res.status(400).json({
                 'status' : "Error",
                 'message' : error.message
@@ -51,11 +73,35 @@ module.exports = {
     deleteBarang : async(req, res) => {
         try {
             const { id } = req.params;
-            const category = await Category.findOne({ _id: id });
-            await category.deleteOne();
-            res.status(200).json({
-                'status' : "SuccesS Edit"
-            })
+            const barang = await Barang.findOne({ "_id": id })
+            // Temukan kategori yang memiliki barang dengan ID yang sesuai
+            const category = await Category.findOne({ "_id": barang.categoryId });
+            
+            if (category) {
+            // Temukan index barang yang ingin dihapus
+            const indexToDelete = category.barangId.findIndex(
+                (barang) => barang._id.toString() === id
+            );
+                if (indexToDelete !== -1) {
+                    category.barangId.splice(indexToDelete, 1);
+                    await category.save();
+
+                    // Hapus barang dari koleksi barang
+                    await Barang.deleteOne({ _id: id });
+
+                    res.status(200).json({
+                    status: "Berhasil Menghapus Barang",
+                    });
+                } else {
+                    res.status(404).json({
+                    status: "Barang Tidak Ditemukan",
+                    });
+                }
+            } else {
+            res.status(404).json({
+                status: "Kategori Tidak Ditemukan",
+            });
+            }
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",
