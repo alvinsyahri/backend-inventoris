@@ -4,7 +4,7 @@ module.exports = {
 
     viewCategory : async(req, res) => {
         try {
-            const category = await Category.find().sort({ createdAt: -1 }).populate({ path: 'barangId'});
+            const category = await Category.find().sort({ createdAt: -1 }).populate({ path: 'barangId', populate:{ path: 'peminjamanId' }});
             res.status(200).json({
                 'status' : "Success",
                 'data' : category
