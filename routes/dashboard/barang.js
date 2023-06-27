@@ -1,10 +1,10 @@
 const express = require('express');
-const barangController = require('../../controller/dashboard/barangController')
+const { viewBarang, addBarang, editBarang, deleteBarang} = require('../../controller/dashboard/barangController')
 const routes = express.Router();
 
-routes.get('/barang', barangController.viewBarang);
-routes.post('/barang', barangController.addBarang);
-routes.put('/barang', barangController.editBarang);
-routes.delete('/barang/:id', barangController.deleteBarang);
+routes.get('/', viewBarang);
+routes.post('/', addBarang);
+routes.put('/', editBarang);
+routes.delete('/:id', deleteBarang);
 
 module.exports = routes;

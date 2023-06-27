@@ -1,13 +1,10 @@
 const express = require('express');
 const app = express();
-const category = require('./dashboard/category');
-const user = require('./dashboard/user');
-const barang = require('./dashboard/barang')
-const peminjaman = require('./dashboard/peminjaman')
+const index = require('./dashboard/index');
+const { verifyUser } = require('../middleware/verifyUser')
+const auth = require('./auth/auth')
 
-app.use('/dashboard/', category);
-app.use('/dashboard/', user);
-app.use('/dashboard/', barang);
-app.use('/dashboard/', peminjaman);
+app.use('/dashboard/', [verifyUser, index]);
+app.use(auth);
 
 module.exports = app

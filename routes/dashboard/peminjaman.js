@@ -1,10 +1,10 @@
 const express = require('express');
-const peminjamanController = require('../../controller/dashboard/peminjamanController')
+const { viewPeminjaman, addPeminjaman, editPeminjaman, deletePeminjaman } = require('../../controller/dashboard/peminjamanController')
 const routes = express.Router();
 
-routes.get('/peminjaman', peminjamanController.viewPeminjaman);
-routes.post('/peminjaman', peminjamanController.addPeminjaman);
-routes.put('/peminjaman', peminjamanController.editPeminjaman);
-routes.delete('/peminjaman/:id', peminjamanController.deletePeminjaman);
+routes.get('/', viewPeminjaman);
+routes.post('/', addPeminjaman);
+routes.put('/', editPeminjaman);
+routes.delete('/:id', deletePeminjaman);
 
 module.exports = routes;
