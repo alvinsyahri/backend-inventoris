@@ -13,7 +13,7 @@ const peminjamanSchema = new mongoose.Schema({
         type: String,
         default: "Aman"
     },
-    UserId: {
+    userId: {
         type: ObjectId,
         ref: 'User'
     },
