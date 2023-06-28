@@ -23,10 +23,13 @@ module.exports = {
           if (!isPasswordMatch) {
             res.redirect('/login').json({Login: false});
           }
-          req.session.username = user.username;
-          const name = req.session.user;
+          
+          const data = {
+            id: user._id,
+            username: user.username
+          }
 
-          const token = jwt.sign({name}, "our-json-secret-key", {expiresIn: '1d'});
+          const token = jwt.sign(data, "12321kamsda-123nasda-12", {expiresIn: '5s'});
           res.cookie('token', token);
           res.json({Login: true, username: req.session.username});
           

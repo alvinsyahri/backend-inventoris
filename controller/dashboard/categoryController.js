@@ -7,7 +7,8 @@ module.exports = {
             const category = await Category.find().sort({ createdAt: -1 }).populate({ path: 'barangId', populate:{ path: 'peminjamanId' }});
             res.status(200).json({
                 'status' : "Success",
-                'data' : category
+                'data' : category,
+                'username': req.username
             });
         } catch (error) {
             res.status(400).json({
