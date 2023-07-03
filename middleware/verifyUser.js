@@ -10,7 +10,6 @@ module.exports = {
             } else{
                 const username = jwt.verify(token, "12321kamsda-123nasda-12")
                 req.username = username;
-                console.log("berhasil")
                 next()
             }
         } catch (error) {
