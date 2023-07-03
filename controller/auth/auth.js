@@ -17,11 +17,11 @@ module.exports = {
           const { username, password } = req.body;
           const user = await User.findOne({ username: username });
           if (!user) {
-            res.redirect('/login').json({Login: false});
+            res.json({Login: false});
           }
           const isPasswordMatch = await bycryptjs.compare(password, user.password);
           if (!isPasswordMatch) {
-            res.redirect('/login').json({Login: false});
+            res.json({Login: false});
           }
           
           const data = {
@@ -29,11 +29,9 @@ module.exports = {
             username: user.username
           }
 
-          const token = jwt.sign(data, "12321kamsda-123nasda-12", {expiresIn: '5s'});
+          const token = jwt.sign(data, "12321kamsda-123nasda-12", {expiresIn: '1d'});
           res.cookie('token', token);
           res.json({Login: true, username: req.session.username});
-          
-          res.redirect('/dashboard');
     
         } catch (error) {
           res.redirect('/login');
@@ -41,7 +39,6 @@ module.exports = {
       },
     
       actionLogout : (req, res) => {
-        req.session.destroy();
-        res.redirect('/login');
+        res.clearCookie('token').json({valid: false})
       },
 }
