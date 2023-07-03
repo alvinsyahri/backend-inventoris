@@ -8,11 +8,13 @@ module.exports = {
             res.status(200).json({
                 'status' : "Success",
                 'data' : category,
+                'valid': true,
                 'username': req.username
             });
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",
+                'valid': false,
                 'message' : error.message
             })
         }
@@ -22,11 +24,13 @@ module.exports = {
             const { name } = req.body;
             await Category.create({name})
             res.status(200).json({
-                'status' : "SuccesS"
+                'status' : "SuccesS",
+                'valid': true
             })
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",
+                'valid': false,
                 'message' : error.message
             })
         }
@@ -40,11 +44,13 @@ module.exports = {
             category.updatedAt = updatedAt;
             await category.save();
             res.status(200).json({
-                'status' : "SuccesS Edit"
+                'status' : "SuccesS Edit",
+                'valid': true
             })
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",
+                'valid': false,
                 'message' : error.message
             })
         }
@@ -55,11 +61,13 @@ module.exports = {
             const category = await Category.findOne({ _id: id });
             await category.deleteOne();
             res.status(200).json({
-                'status' : "SuccesS Edit"
+                'status' : "SuccesS Edit",
+                'valid': true,
             })
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",
+                'valid': false,
                 'message' : error.message
             })
         }
