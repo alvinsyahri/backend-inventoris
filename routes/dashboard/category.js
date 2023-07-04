@@ -4,7 +4,7 @@ const routes = express.Router();
 
 routes.get('/', viewCategory);
 routes.post('/', addCategory);
-routes.put('/', editCategory);
+routes.put('/:id', editCategory);
 routes.delete('/:id', deleteCategory);
 
 module.exports = routes;

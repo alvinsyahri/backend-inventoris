@@ -34,7 +34,7 @@ module.exports = {
           res.json({Login: true, username: req.session.username});
     
         } catch (error) {
-          res.redirect('/login');
+          
         }
       },
     

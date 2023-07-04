@@ -37,7 +37,8 @@ module.exports = {
     },
     editCategory : async(req, res) => {
         try {
-            const { id, name } = req.body;
+            const { id } = req.params;
+            const { name } = req.body;
             const updatedAt = new Date()
             const category =  await Category.findOne({ _id: id})
             category.name = name;

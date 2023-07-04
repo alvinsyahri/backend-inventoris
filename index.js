@@ -13,7 +13,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/inventoris');
 
 app.use(cors({
   origin: ["http://localhost:5173"],
-  methods: ["POST", "GET", "DELETE", "PATCH"],
+  methods: ["POST", "GET", "DELETE", "PATCH", "PUT"],
   credentials: true
 }));
 app.use(express.json());
