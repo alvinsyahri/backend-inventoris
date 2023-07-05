@@ -4,7 +4,7 @@ const routes = express.Router();
 
 routes.get('/', viewUser);
 routes.post('/', addUser);
-routes.put('/', editUser);
+routes.put('/:id', editUser);
 routes.delete('/:id', deleteUser);
 
 module.exports = routes;

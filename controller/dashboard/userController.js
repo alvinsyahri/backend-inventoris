@@ -31,7 +31,8 @@ module.exports = {
     },
     editUser : async(req, res) => {
         try {
-            const { id, name, username, password, isAdmin } = req.body;
+            const { id } = req.params;
+            const { name, password, username, isAdmin } = req.body;
             const updatedAt = new Date()
             const user =  await User.findOne({ _id: id})
             user.name = name;
