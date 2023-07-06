@@ -5,7 +5,8 @@ module.exports = {
 
     viewPeminjaman : async(req, res) => {
         try {
-            const peminjaman = await Peminjaman.find().sort({ createdAt: -1 }).populate({ path: 'barangId'});
+            const peminjaman = await Peminjaman.find().sort({ createdAt: -1 }).populate('barangId')
+            .populate('userId');
             res.status(200).json({
                 'status' : "Success",
                 'data' : peminjaman
@@ -19,13 +20,12 @@ module.exports = {
     },
     addPeminjaman : async(req, res) => {
         try {
-            const { keterangan, userId, barangId } = req.body;
+            const { userId, barangId, tanggalPinjam } = req.body;
             const newPeminjaman = {
-                keterangan,
                 userId,
-                barangId
+                barangId,
+                tanggalPinjam
             };
-
             const peminjaman = await Peminjaman.create(newPeminjaman);
             
             const barang = await Barang.findOne({ _id: barangId});

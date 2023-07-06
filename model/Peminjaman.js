@@ -9,10 +9,6 @@ const peminjamanSchema = new mongoose.Schema({
     tanggalKembali: {
         type: Date,
     },
-    keterangan: {
-        type: String,
-        default: "Aman"
-    },
     userId: {
         type: ObjectId,
         ref: 'User'

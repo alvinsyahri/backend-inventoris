@@ -5,7 +5,7 @@ module.exports = {
 
     viewBarang : async(req, res) => {
         try {
-            const barang = await Barang.find().sort({ createdAt: -1 });
+            const barang = await Barang.find().sort({ createdAt: -1 }).populate({ path: 'categoryId' });
             res.status(200).json({
                 'status' : "Success",
                 'data' : barang
@@ -19,12 +19,11 @@ module.exports = {
     },
     addBarang : async(req, res) => {
         try {
-            const { kode, deskripsi, serialNumber, lokasi, tahun, keterangan, kondisi,  categoryId} = req.body;
+            const { deskripsi, kode, serialNumber, tahun, keterangan, kondisi, categoryId} = req.body;
             const newBarang = {
-                kode,
                 deskripsi,
+                kode,
                 serialNumber,
-                lokasi,
                 tahun,
                 keterangan,
                 kondisi,
@@ -46,7 +45,8 @@ module.exports = {
     },
     editBarang : async(req, res) => {
         try {
-            const { id, kode, deskripsi, serialNumber, lokasi, tahun, keterangan, kondisi,  categoryId } = req.body;
+            const { id } = req.params;
+            const { kode, deskripsi, serialNumber, lokasi, tahun, keterangan, kondisi,  categoryId } = req.body;
             const updatedAt = new Date()
             const barang =  await Barang.findOne({ _id: id})
             barang.kode = kode;

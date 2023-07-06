@@ -4,7 +4,7 @@ const routes = express.Router();
 
 routes.get('/', viewBarang);
 routes.post('/', addBarang);
-routes.put('/', editBarang);
+routes.put('/:id', editBarang);
 routes.delete('/:id', deleteBarang);
 
 module.exports = routes;

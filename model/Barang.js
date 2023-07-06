@@ -14,10 +14,6 @@ const barangSchema = new mongoose.Schema({
         type: String,
        required: true 
     },
-    lokasi: {
-        type: String,
-       required: true 
-    },
     tahun: {
         type: String,
        required: true 
