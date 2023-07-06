@@ -8,6 +8,15 @@ const peminjamanSchema = new mongoose.Schema({
     },
     tanggalKembali: {
         type: Date,
+        default: ""
+    },
+    status: {
+        type: Boolean,
+        default: true
+    },
+    keterangan: {
+        type: String,
+        default: ""
     },
     userId: {
         type: ObjectId,

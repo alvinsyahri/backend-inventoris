@@ -1,12 +1,21 @@
 const Barang = require('../../model/Barang');
 const Peminjaman = require('../../model/Peminjaman');
+const User = require('../../model/User');
 
 module.exports = {
 
     viewPeminjaman : async(req, res) => {
         try {
-            const peminjaman = await Peminjaman.find().sort({ createdAt: -1 }).populate('barangId')
-            .populate('userId');
+            const peminjaman = await Peminjaman.find({ 'status': true })
+            .sort({ createdAt: -1 })
+            .populate({
+                path: 'barangId',
+                select: 'kode',
+              })
+            .populate({
+                path: 'userId',
+                select: 'name'
+            });
             res.status(200).json({
                 'status' : "Success",
                 'data' : peminjaman
@@ -20,21 +29,32 @@ module.exports = {
     },
     addPeminjaman : async(req, res) => {
         try {
-            const { userId, barangId, tanggalPinjam } = req.body;
+            const { userId, barangId, keterangan } = req.body;
             const newPeminjaman = {
                 userId,
                 barangId,
-                tanggalPinjam
+                keterangan
             };
-            const peminjaman = await Peminjaman.create(newPeminjaman);
-            
             const barang = await Barang.findOne({ _id: barangId});
-            barang.status = true;
-            barang.peminjamanId.push({ _id: peminjaman._id});
-            barang.save(); 
-            res.status(200).json({
-                'status' : "SuccesS"
-            })
+            if(!barang.status){
+                const peminjaman = await Peminjaman.create(newPeminjaman);
+                const user = await User.findOne({ _id: userId})
+                
+                barang.status = true;
+                barang.peminjamanId.push({ _id: peminjaman._id});
+                barang.save();
+                const text = `Data Peminjaman: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${new Date()}`
+                res.status(200).json({
+                    'status' : "Success",
+                    'user' : user,
+                    'barang' : barang,
+                    'text' : text
+                })
+            }else{
+                res.status(400).json({
+                    'status' : "barang sedang dipinjam",
+                })
+            }
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",
@@ -44,27 +64,34 @@ module.exports = {
     },
     editPeminjaman : async(req, res) => {
         try {
-            const { id, keterangan, userId, barangId } = req.body;
+            const { keterangan, userId, barangId } = req.body;
+            const { id } = req.params
             const updatedAt = new Date()
-            const peminjaman =  await Peminjaman.findOne({ _id: id})
-            const updateBarangId = peminjaman.barangId;
-
-            peminjaman.keterangan = keterangan;
-            peminjaman.userId = userId;
-            peminjaman.barangId = barangId;
-            peminjaman.updatedAt = updatedAt;
-            await peminjaman.save();
-
-            const barang = await Barang.findOne({ _id: updateBarangId})
-            barang.status = false;
-            barang.save();
-
             const barangUpdate = await Barang.findOne({ _id: barangId})
-            barangUpdate.status = true;
-            barangUpdate.save();
-            res.status(200).json({
-                'status' : "SuccesS Edit"
-            })
+            if(!barangUpdate.status){
+                const peminjaman =  await Peminjaman.findOne({ _id: id})
+                const updateBarangId = peminjaman.barangId;
+    
+                peminjaman.keterangan = keterangan;
+                peminjaman.userId = userId;
+                peminjaman.barangId = barangId;
+                peminjaman.updatedAt = updatedAt;
+                await peminjaman.save();
+    
+                const barang = await Barang.findOne({ _id: updateBarangId})
+                barang.status = false;
+                barang.save();
+    
+                barangUpdate.status = true;
+                barangUpdate.save();
+                res.status(200).json({
+                    'status' : "Success Edit"
+                })
+            }else{
+                res.status(400).json({
+                    'status' : "barang sedang dipinjam"
+                })
+            }
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",
@@ -72,33 +99,21 @@ module.exports = {
             })
         }
     },
-    deletePeminjaman : async(req, res) => {
+    checkPeminjaman: async(req, res) => {
         try {
-            const { id } = req.params;
-            const peminjaman = await Peminjaman.findOne({ "_id": id })
-            const barang = await Barang.findOne({ "_id": peminjaman.barangId });
-            
-            if (barang) {
-            const indexToDelete = barang.peminjamanId.findIndex(
-                (peminjaman) => peminjaman._id.toString() === id
-            );
-                if (indexToDelete !== -1) {
-                    barang.peminjamanId.splice(indexToDelete, 1);
-                    await barang.save();
-                    await Peminjaman.deleteOne({ _id: id });
-                    res.status(200).json({
-                        status: "Berhasil Menghapus peminjaman",
-                    });
-                } else {
-                    res.status(404).json({
-                        status: "peminjaman Tidak Ditemukan",
-                    });
-                }
-            } else {
-            res.status(404).json({
-                status: "Kategori Tidak Ditemukan",
-            });
-            }
+            const { id } = req.params
+            const user = await User.findOne({ _id: req.username.id})
+            const peminjaman =  await Peminjaman.findOne({ _id: id})
+            peminjaman.status = false
+            peminjaman.save()
+            const barang = await Barang.findOne({ _id: peminjaman.barangId})
+            barang.status = false;
+            barang.save();
+            const text = `Data Pengembalian: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${peminjaman.tanggalPinjam} %0A - Tanggal Pengembalian: ${new Date()}`
+            res.status(200).json({
+                'status' : "Success Check",
+                'text' : text
+            })
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",
@@ -107,3 +122,4 @@ module.exports = {
         }
     }
 }
+
