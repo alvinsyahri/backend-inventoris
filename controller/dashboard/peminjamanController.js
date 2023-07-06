@@ -46,8 +46,6 @@ module.exports = {
                 const text = `Data Peminjaman: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${new Date()}`
                 res.status(200).json({
                     'status' : "Success",
-                    'user' : user,
-                    'barang' : barang,
                     'text' : text
                 })
             }else{
@@ -105,6 +103,7 @@ module.exports = {
             const user = await User.findOne({ _id: req.username.id})
             const peminjaman =  await Peminjaman.findOne({ _id: id})
             peminjaman.status = false
+            peminjaman.tanggalKembali = new Date()
             peminjaman.save()
             const barang = await Barang.findOne({ _id: peminjaman.barangId})
             barang.status = false;

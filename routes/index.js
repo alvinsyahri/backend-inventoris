@@ -1,10 +1,12 @@
 const express = require('express');
 const app = express();
-const index = require('./dashboard/index');
+const indexDashboard = require('./dashboard/index');
+const indexClient = require('./client/index');
 const { verifyUser } = require('../middleware/verifyUser')
 const auth = require('./auth/auth')
 
-app.use('/dashboard/', [verifyUser, index]);
 app.use(auth);
+app.use('/dashboard/', [verifyUser, indexDashboard]);
+app.use('/client/', [verifyUser, indexClient]);
 
 module.exports = app
