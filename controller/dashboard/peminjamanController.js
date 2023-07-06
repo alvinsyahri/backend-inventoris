@@ -17,7 +17,7 @@ module.exports = {
             });
             res.status(200).json({
                 'status' : "Success",
-                'data' : peminjaman,
+                'data' : peminjaman
             });
         } catch (error) {
             res.status(400).json({
@@ -42,7 +42,7 @@ module.exports = {
                 barang.status = true;
                 barang.peminjamanId.push({ _id: peminjaman._id});
                 barang.save();
-                const text = `Data Peminjaman: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${new Date()}`
+                const text = `Data Peminjaman: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${getDate(new Date())}`
                 res.status(200).json({
                     'status' : "Success",
                     'text' : text
@@ -107,7 +107,7 @@ module.exports = {
             const barang = await Barang.findOne({ _id: peminjaman.barangId})
             barang.status = false;
             barang.save();
-            const text = `Data Pengembalian: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${peminjaman.tanggalPinjam} %0A - Tanggal Pengembalian: ${new Date()}`
+            const text = `Data Pengembalian: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${getDate(peminjaman.tanggalPinjam)} %0A - Tanggal Pengembalian: ${getDate(new Date())}`
             res.status(200).json({
                 'status' : "Success Check",
                 'text' : text
