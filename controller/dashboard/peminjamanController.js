@@ -1,6 +1,7 @@
 const Barang = require('../../model/Barang');
 const Peminjaman = require('../../model/Peminjaman');
 const User = require('../../model/User');
+const getDate = require('../../middleware/date')
 
 module.exports = {
 
@@ -10,15 +11,13 @@ module.exports = {
             .sort({ createdAt: -1 })
             .populate({
                 path: 'barangId',
-                select: 'kode',
               })
             .populate({
                 path: 'userId',
-                select: 'name'
             });
             res.status(200).json({
                 'status' : "Success",
-                'data' : peminjaman
+                'data' : peminjaman,
             });
         } catch (error) {
             res.status(400).json({
