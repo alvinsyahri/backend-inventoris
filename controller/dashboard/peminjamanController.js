@@ -2,6 +2,7 @@ const Barang = require('../../model/Barang');
 const Peminjaman = require('../../model/Peminjaman');
 const User = require('../../model/User');
 const getDate = require('../../middleware/date')
+const axios = require('axios')
 
 module.exports = {
 
@@ -42,10 +43,10 @@ module.exports = {
                 barang.status = true;
                 barang.peminjamanId.push({ _id: peminjaman._id});
                 barang.save();
-                const text = `Data Peminjaman: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${getDate(new Date())}`
+                const text = `Data Peminjaman: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${getDate(new Date())} %0A - Keterangan: ${keterangan}`
+                await axios.get(`https://api.telegram.org/bot6390829982:AAGD5YB4WrQhMoVbXCLdYSDokCT2BgZPfwI/sendMessage?chat_id=-953171747&text=${text}`)
                 res.status(200).json({
                     'status' : "Success",
-                    'text' : text
                 })
             }else{
                 res.status(400).json({
@@ -108,6 +109,8 @@ module.exports = {
             barang.status = false;
             barang.save();
             const text = `Data Pengembalian: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${getDate(peminjaman.tanggalPinjam)} %0A - Tanggal Pengembalian: ${getDate(new Date())}`
+            await axios.get(`https://api.telegram.org/bot6390829982:AAGD5YB4WrQhMoVbXCLdYSDokCT2BgZPfwI/sendMessage?chat_id=-953171747&text=${text}`)
+            
             res.status(200).json({
                 'status' : "Success Check",
                 'text' : text
