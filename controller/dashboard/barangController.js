@@ -5,7 +5,18 @@ module.exports = {
 
     viewBarang : async(req, res) => {
         try {
-            const item = await Item.find().sort({ createdAt: -1 }).populate({ path: 'subCategoryId', select: 'name', populate: { path: 'categoryId', select: 'name'}});
+            const item = await Item.find()
+            .sort({ createdAt: -1 })
+            .populate(
+                { 
+                    path: 'subCategoryId', 
+                    select: 'name', 
+                    populate: { 
+                        path: 'categoryId', 
+                        select: 'name'
+                    }
+                }
+            );
             res.status(200).json({
                 'status' : "Success",
                 'data' : item

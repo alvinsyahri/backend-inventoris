@@ -6,7 +6,14 @@ module.exports = {
 
     viewCategory : async(req, res) => {
         try {
-            const subCategory = await SubCategory.find().sort({ createdAt: -1 }).populate({ path: 'categoryId', select: 'name'});
+            const subCategory = await SubCategory.find()
+            .sort({ createdAt: -1 })
+            .populate(
+                { 
+                    path: 'categoryId', 
+                    select: 'name'
+                }
+            );
             res.status(200).json({
                 'status' : "Success",
                 'data' : subCategory,

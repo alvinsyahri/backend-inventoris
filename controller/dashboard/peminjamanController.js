@@ -10,12 +10,26 @@ module.exports = {
         try {
             const loan = await Loan.find({ 'status': true })
             .sort({ createdAt: -1 })
-            .populate({
-                path: 'itemId',
-              })
-            .populate({
-                path: 'userId',
-            });
+            .populate(
+                {
+                    path: 'itemId',
+                    select: 'name serialNumber procurementYear condition qty description',
+                    populate: {
+                        path: 'subCategoryId',
+                        select: 'name',
+                        populate: {
+                            path: 'categoryId',
+                            select: 'name'
+                        }
+                    }
+                }
+            )
+            .populate(
+                {
+                    path: 'userId',
+                    select: 'name username isAdmin'
+                }
+            );
             res.status(200).json({
                 'status' : "Success",
                 'data' : loan
@@ -29,25 +43,32 @@ module.exports = {
     },
     addPeminjaman : async(req, res) => {
         try {
-            const { userId, barangId, description } = req.body;
-            const date = {
+            const { userId, itemId, description, qty } = req.body;
+            const jumlah = qty ? qty: 1    
+            const data = {
                 userId,
-                barangId,
+                itemId,
                 description,
-                qty
+                qty: jumlah
             };
-            const item = await Item.findOne({ _id: barangId});
-            if(!item.status){
-                const peminjaman = await Loan.create(data);
-                const user = await User.findOne({ _id: userId})           
-                item.status = true;
-                item.peminjamanId.push({ _id: peminjaman._id});
-                item.save();
-                const text = `Loan Data: %0A - User Name: ${user.name} %0A - Name of Goods: ${item.name} %0A - Loan Date: ${getDate(new Date())} %0A - Description: ${description}`
-                await axios.get(`https://api.telegram.org/bot6390829982:AAGD5YB4WrQhMoVbXCLdYSDokCT2BgZPfwI/sendMessage?chat_id=-953171747&text=${text}`)
-                res.status(200).json({
-                    'status' : "Success",
-                })
+            const item = await Item.findOne({ _id: itemId});
+            if(item.qty > 0){
+                if(jumlah <= item.qty){
+                    await Loan.create(data);
+                    const user = await User.findOne({ _id: userId})
+                    const stok = item.qty
+                    item.qty = (stok - jumlah)
+                    item.save()
+                    const text = `Loan Data: %0A - User Name: ${user.name} %0A - Name of Goods: ${item.name} %0A - Loan Date: ${getDate(new Date())} %0A - Description: ${description}`
+                    await axios.get(`https://api.telegram.org/bot6390829982:AAGD5YB4WrQhMoVbXCLdYSDokCT2BgZPfwI/sendMessage?chat_id=-953171747&text=${text}`)
+                    res.status(200).json({
+                        'status' : "Success",
+                    })
+                }else{
+                    res.status(400).json({
+                        'status' : "stok tidak mencukupi"
+                    })
+                }
             }else{
                 res.status(400).json({
                     'status' : "barang sedang dipinjam",
@@ -62,29 +83,38 @@ module.exports = {
     },
     editPeminjaman : async(req, res) => {
         try {
-            const { keterangan, userId, barangId } = req.body;
             const { id } = req.params
-            const updatedAt = new Date()
-            const itemUpdate = await Item.findOne({ _id: barangId})
-            if(!itemUpdate.status){
-                const loan =  await Loan.findOne({ _id: id})
-                const updateItemId = loan.barangId;
-    
-                loan.keterangan = keterangan;
-                loan.userId = userId;
-                loan.barangId = barangId;
-                loan.updatedAt = updatedAt;
-                await loan.save();
-    
-                const item = await Item.findOne({ _id: updateItemId})
-                item.status = false;
-                item.save();
-    
-                itemUpdate.status = true;
-                itemUpdate.save();
-                res.status(200).json({
-                    'status' : "Success Edit"
-                })
+            const { userId, itemId, description, qty } = req.body;
+            const jumlah = qty ? qty: 1    
+            const data = {
+                userId,
+                itemId,
+                description,
+                qty: jumlah,
+                updatedAt: new Date()
+            };
+            const loan = await Loan.findOne({ _id: id}).populate({ path: 'itemId', populate: { path: 'subCategory', populate: { path: 'categoryId' } }})
+            const item = await Item.findOne({ _id: itemId}).populate({ path: 'subCategory', populate: { path: 'categoryId' } });
+            if(loan.itemId.subCategoryId.categoryId._id === item.subCategoryId.categoryId._id){
+                
+            }
+            item.qty = (loan.qty + item.qty)
+            item.save()
+            if(item.qty > 0){
+                console.log(jumlah <= item.qty)
+                if(jumlah <= item.qty){
+                    await Loan.findByIdAndUpdate(id, data)
+                    const item = await Item.findOne({ _id: loan.itemId})
+                    item.qty = (item.qty - qty);
+                    item.save();
+                    res.status(200).json({
+                        'status' : "Success Edit"
+                    })
+                }else{
+                    res.status(400).json({
+                        'status' : "stok tidak mencukupi"
+                    })
+                }
             }else{
                 res.status(400).json({
                     'status' : "barang sedang dipinjam"
