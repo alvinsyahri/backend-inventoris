@@ -19,10 +19,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         required: true
     },
-    PeminjamanId: [{
-        type: ObjectId,
-        ref: 'Peminjaman'
-    }],
     createdAt: {
         type: Date,
         default: Date.now 

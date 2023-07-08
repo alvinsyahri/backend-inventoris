@@ -1,30 +1,30 @@
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
-const peminjamanSchema = new mongoose.Schema({
-    tanggalPinjam: {
+const loanSchema = new mongoose.Schema({
+    loanDate: {
         type: Date,
         default: Date.now
     },
-    tanggalKembali: {
+    returnDate: {
         type: Date,
+        default: ""
+    },
+    description: {
+        type: String,
         default: ""
     },
     status: {
         type: Boolean,
         default: true
     },
-    keterangan: {
-        type: String,
-        default: ""
-    },
     userId: {
         type: ObjectId,
         ref: 'User'
     },
-    barangId: {
+    itemId: {
         type: ObjectId,
-        ref: 'Barang'
+        ref: 'Item'
     },
     createdAt: {
         type: Date,
@@ -36,4 +36,4 @@ const peminjamanSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Peminjaman', peminjamanSchema);
+module.exports = mongoose.model('Loan', loanSchema);

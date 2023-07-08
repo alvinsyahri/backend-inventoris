@@ -1,14 +1,13 @@
-const Barang = require('../../model/Barang');
-const Category = require('../../model/Category');
+const Item = require('../../model/Item');
 
 module.exports = {
 
     viewBarang : async(req, res) => {
         try {
-            const barang = await Barang.find().sort({ createdAt: -1 }).populate({ path: 'categoryId' });
+            const item = await Item.find().sort({ createdAt: -1 }).populate({ path: 'subCategoryId' });
             res.status(200).json({
                 'status' : "Success",
-                'data' : barang
+                'data' : item
             });
         } catch (error) {
             res.status(400).json({
@@ -19,20 +18,17 @@ module.exports = {
     },
     addBarang : async(req, res) => {
         try {
-            const { deskripsi, kode, serialNumber, tahun, keterangan, kondisi, categoryId} = req.body;
-            const newBarang = {
-                deskripsi,
-                kode,
-                serialNumber,
-                tahun,
-                keterangan,
-                kondisi,
-                categoryId
+            const { name, serialNumber, procurementYear, condition, qty, description, SubCategoryId } = req.body;
+            const data = {
+                name, 
+                serialNumber, 
+                procurementYear,
+                condition,
+                qty,
+                description,
+                SubCategoryId
             }
-            const barang = await Barang.create(newBarang);
-            const category = await Category.findOne({ _id: categoryId});
-            category.barangId.push({ _id: barang._id})
-            category.save()
+            await Item.create(data);
             res.status(200).json({
                 'status' : "SuccesS"
             })
@@ -46,19 +42,28 @@ module.exports = {
     editBarang : async(req, res) => {
         try {
             const { id } = req.params;
-            const { kode, deskripsi, serialNumber, lokasi, tahun, keterangan, kondisi,  categoryId } = req.body;
-            const updatedAt = new Date()
-            const barang =  await Barang.findOne({ _id: id})
-            barang.kode = kode;
-            barang.deskripsi = deskripsi,
-            barang.serialNumber = serialNumber,
-            barang.lokasi = lokasi,
-            barang.tahun = tahun,
-            barang.keterangan = keterangan,
-            barang.kondisi = kondisi,
-            barang.categoryId = categoryId,
-            barang.updatedAt = updatedAt
-            await barang.save();
+            const { name, serialNumber, procurementYear, condition, qty, description, subCategoryId } = req.body;
+            const data = {
+                name, 
+                serialNumber, 
+                procurementYear,
+                condition,
+                qty,
+                description,
+                subCategoryId,
+                updatedAt : new Date()
+            }
+            // const updatedAt = new Date()
+            const item =  await Item.findByIdAndUpdate(id, data)
+            // item.name = name;
+            // item.serialNumber = serialNumber,
+            // item.procurementYear = procurementYear,
+            // item.condition = condition,
+            // item.qty = qty,
+            // item.description = description,
+            // item.subCategoryId = subCategoryId,
+            // item.updatedAt = updatedAt
+            await item.save();
             res.status(200).json({
                 'status' : "SuccesS Edit"
             })
@@ -73,35 +78,7 @@ module.exports = {
     deleteBarang : async(req, res) => {
         try {
             const { id } = req.params;
-            const barang = await Barang.findOne({ "_id": id })
-            // Temukan kategori yang memiliki barang dengan ID yang sesuai
-            const category = await Category.findOne({ "_id": barang.categoryId });
-            
-            if (category) {
-            // Temukan index barang yang ingin dihapus
-            const indexToDelete = category.barangId.findIndex(
-                (barang) => barang._id.toString() === id
-            );
-                if (indexToDelete !== -1) {
-                    category.barangId.splice(indexToDelete, 1);
-                    await category.save();
-
-                    // Hapus barang dari koleksi barang
-                    await Barang.deleteOne({ _id: id });
-
-                    res.status(200).json({
-                    status: "Berhasil Menghapus Barang",
-                    });
-                } else {
-                    res.status(404).json({
-                    status: "Barang Tidak Ditemukan",
-                    });
-                }
-            } else {
-            res.status(404).json({
-                status: "Kategori Tidak Ditemukan",
-            });
-            }
+            await Item.deleteOne({ "_id": id })
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",

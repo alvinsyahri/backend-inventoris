@@ -1,12 +1,8 @@
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
-const barangSchema = new mongoose.Schema({
-    kode: {
-        type: String,
-        required: true
-    },
-    deskripsi: {
+const itemSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: true 
     },
@@ -14,28 +10,25 @@ const barangSchema = new mongoose.Schema({
         type: String,
        required: true 
     },
-    tahun: {
+    procurementYear: {
         type: String,
        required: true 
     },
-    keterangan: {
-        type: String, 
-    },
-    kondisi: {
+    condition: {
         type: String,
+        default: "Baru" 
     },
-    categoryId: {
+    qty: {
+        type: Number,
+        default: 1
+    },
+    description: {
+        type: String
+    },
+    subCategoryId: {
         type: ObjectId,
-        ref: 'Category'
+        ref: 'SubCategory'
     },
-    status:{
-        type: Boolean,
-        default: false
-    },
-    peminjamanId: [{
-        type: ObjectId,
-        ref: 'Peminjaman'
-    }],
     createdAt: {
         type: Date,
         default: Date.now 
@@ -46,4 +39,4 @@ const barangSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Barang', barangSchema);
+module.exports = mongoose.model('Item', itemSchema);

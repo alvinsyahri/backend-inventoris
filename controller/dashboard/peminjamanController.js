@@ -1,5 +1,5 @@
-const Barang = require('../../model/Barang');
-const Peminjaman = require('../../model/Peminjaman');
+const Item = require('../../model/Item');
+const Loan = require('../../model/Loan');
 const User = require('../../model/User');
 const getDate = require('../../middleware/date')
 const axios = require('axios')
@@ -8,17 +8,17 @@ module.exports = {
 
     viewPeminjaman : async(req, res) => {
         try {
-            const peminjaman = await Peminjaman.find({ 'status': true })
+            const loan = await Loan.find({ 'status': true })
             .sort({ createdAt: -1 })
             .populate({
-                path: 'barangId',
+                path: 'itemId',
               })
             .populate({
                 path: 'userId',
             });
             res.status(200).json({
                 'status' : "Success",
-                'data' : peminjaman
+                'data' : loan
             });
         } catch (error) {
             res.status(400).json({
@@ -29,21 +29,20 @@ module.exports = {
     },
     addPeminjaman : async(req, res) => {
         try {
-            const { userId, barangId, keterangan } = req.body;
-            const newPeminjaman = {
+            const { userId, barangId, description } = req.body;
+            const date = {
                 userId,
                 barangId,
-                keterangan
+                description
             };
-            const barang = await Barang.findOne({ _id: barangId});
-            if(!barang.status){
-                const peminjaman = await Peminjaman.create(newPeminjaman);
-                const user = await User.findOne({ _id: userId})
-                
-                barang.status = true;
-                barang.peminjamanId.push({ _id: peminjaman._id});
-                barang.save();
-                const text = `Data Peminjaman: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${getDate(new Date())} %0A - Keterangan: ${keterangan}`
+            const item = await Item.findOne({ _id: barangId});
+            if(!item.status){
+                const peminjaman = await Loan.create(data);
+                const user = await User.findOne({ _id: userId})           
+                item.status = true;
+                item.peminjamanId.push({ _id: peminjaman._id});
+                item.save();
+                const text = `Loan Data: %0A - User Name: ${user.name} %0A - Name of Goods: ${item.name} %0A - Loan Date: ${getDate(new Date())} %0A - Description: ${description}`
                 await axios.get(`https://api.telegram.org/bot6390829982:AAGD5YB4WrQhMoVbXCLdYSDokCT2BgZPfwI/sendMessage?chat_id=-953171747&text=${text}`)
                 res.status(200).json({
                     'status' : "Success",
@@ -65,23 +64,23 @@ module.exports = {
             const { keterangan, userId, barangId } = req.body;
             const { id } = req.params
             const updatedAt = new Date()
-            const barangUpdate = await Barang.findOne({ _id: barangId})
-            if(!barangUpdate.status){
-                const peminjaman =  await Peminjaman.findOne({ _id: id})
-                const updateBarangId = peminjaman.barangId;
+            const itemUpdate = await Item.findOne({ _id: barangId})
+            if(!itemUpdate.status){
+                const loan =  await Loan.findOne({ _id: id})
+                const updateItemId = loan.barangId;
     
-                peminjaman.keterangan = keterangan;
-                peminjaman.userId = userId;
-                peminjaman.barangId = barangId;
-                peminjaman.updatedAt = updatedAt;
-                await peminjaman.save();
+                loan.keterangan = keterangan;
+                loan.userId = userId;
+                loan.barangId = barangId;
+                loan.updatedAt = updatedAt;
+                await loan.save();
     
-                const barang = await Barang.findOne({ _id: updateBarangId})
-                barang.status = false;
-                barang.save();
+                const item = await Item.findOne({ _id: updateItemId})
+                item.status = false;
+                item.save();
     
-                barangUpdate.status = true;
-                barangUpdate.save();
+                itemUpdate.status = true;
+                itemUpdate.save();
                 res.status(200).json({
                     'status' : "Success Edit"
                 })
@@ -101,14 +100,14 @@ module.exports = {
         try {
             const { id } = req.params
             const user = await User.findOne({ _id: req.username.id})
-            const peminjaman =  await Peminjaman.findOne({ _id: id})
-            peminjaman.status = false
-            peminjaman.tanggalKembali = new Date()
-            peminjaman.save()
-            const barang = await Barang.findOne({ _id: peminjaman.barangId})
-            barang.status = false;
-            barang.save();
-            const text = `Data Pengembalian: %0A - Nama User: ${user.name} %0A - Nama Barang: ${barang.deskripsi} %0A - Tanggal Peminjaman: ${getDate(peminjaman.tanggalPinjam)} %0A - Tanggal Pengembalian: ${getDate(new Date())}`
+            const loan =  await Loan.findOne({ _id: id})
+            loan.status = false
+            loan.tanggalKembali = new Date()
+            loan.save()
+            const item = await Item.findOne({ _id: loan.barangId})
+            item.status = false;
+            item.save();
+            const text = `Return Date: %0A - User Name: ${user.name} %0A - Name of Goods: ${barang.name} %0A - Loan Date: ${getDate(peminjaman.tanggalPinjam)} %0A - Return Date: ${getDate(new Date())}`
             await axios.get(`https://api.telegram.org/bot6390829982:AAGD5YB4WrQhMoVbXCLdYSDokCT2BgZPfwI/sendMessage?chat_id=-953171747&text=${text}`)
             
             res.status(200).json({

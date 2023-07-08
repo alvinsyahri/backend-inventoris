@@ -2,6 +2,7 @@
 
 const mongoose = require("mongoose")
 const User = require("./model/User")
+const Category = require("./model/Category")
 
 async function seedData() {
     // Connection URL
@@ -15,14 +16,25 @@ async function seedData() {
     }).catch((err) => {
         console.log("error", err)
     })
-    const data = {
+    const user = {
         name: 'Admin',
         username: 'admin',
         password: 'rahasia',
         isAdmin: true
     }
+
+    const category = [
+        {
+            name: 'Disposable',
+        },
+        {
+            name: 'Not Disposable'
+        }
+    ]
     const seedDB = async () => {
-        await User.create(data)
+        await User.create(user)
+        await Category.create(category[0])
+        await Category.create(category[1])
     }
 
     seedDB().then(() => {

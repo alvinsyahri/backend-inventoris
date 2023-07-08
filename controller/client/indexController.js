@@ -1,9 +1,9 @@
-const Peminjaman = require('../../model/Peminjaman')
+const Loan = require('../../model/Loan')
 
 module.exports = {
     viewPeminjaman : async(req, res) => {
         try {
-            const peminjaman = await Peminjaman.find({ "userId": req.username.id })
+            const loan = await Loan.find({ "userId": req.username.id })
             .sort({ createdAt: -1 })
             .populate({
                 path: 'barangId',
@@ -14,7 +14,7 @@ module.exports = {
                 select: 'name'
             });
             res.status(200).json({
-                'data' : peminjaman
+                'data' : loan
             })
         } catch (error) {
             res.status(400).json({

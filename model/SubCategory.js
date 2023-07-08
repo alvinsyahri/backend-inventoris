@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
-const categorySchema = new mongoose.Schema({
+const subCategorySchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
     },
-    subCategoryId: [{
+    categoryId: {
         type: ObjectId,
-        ref: 'SubCategory'
-    }],
+        ref: 'Category'
+    },
     createdAt: {
         type: Date,
         default: Date.now 
@@ -20,4 +20,4 @@ const categorySchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Category', categorySchema);
+module.exports = mongoose.model('SubCategory', subCategorySchema);
