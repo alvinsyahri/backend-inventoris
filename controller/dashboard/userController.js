@@ -18,7 +18,13 @@ module.exports = {
     addUser : async(req, res) => {
         try {
             const { name, username, password, isAdmin } = req.body;
-            await User.create({name, username, password, isAdmin})
+            const data = {
+                name,
+                username,
+                password,
+                isAdmin
+            }
+            await User.create(data)
             res.status(200).json({
                 'status' : "SuccesS"
             })
@@ -33,13 +39,14 @@ module.exports = {
         try {
             const { id } = req.params;
             const { name, password, username, isAdmin } = req.body;
-            const updatedAt = new Date()
-            const user =  await User.findOne({ _id: id})
-            user.name = name;
-            user.username = username;
-            user.password = password;
-            user.isAdmin = isAdmin;
-            user.updatedAt = updatedAt;
+            const data = {
+                name,
+                username,
+                password,
+                isAdmin,
+                updatedAt : new Date()
+            }
+            const user =  await User.findByIdAndUpdate(id, data)
             await user.save();
             res.status(200).json({
                 'status' : "SuccesS Edit"

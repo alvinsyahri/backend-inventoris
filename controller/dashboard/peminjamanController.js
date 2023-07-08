@@ -33,7 +33,8 @@ module.exports = {
             const date = {
                 userId,
                 barangId,
-                description
+                description,
+                qty
             };
             const item = await Item.findOne({ _id: barangId});
             if(!item.status){

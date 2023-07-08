@@ -1,10 +1,11 @@
 const Item = require('../../model/Item');
+const Category = require('../../model/Category');
 
 module.exports = {
 
     viewBarang : async(req, res) => {
         try {
-            const item = await Item.find().sort({ createdAt: -1 }).populate({ path: 'subCategoryId' });
+            const item = await Item.find().sort({ createdAt: -1 }).populate({ path: 'subCategoryId', select: 'name', populate: { path: 'categoryId', select: 'name'}});
             res.status(200).json({
                 'status' : "Success",
                 'data' : item
@@ -18,19 +19,18 @@ module.exports = {
     },
     addBarang : async(req, res) => {
         try {
-            const { name, serialNumber, procurementYear, condition, qty, description, SubCategoryId } = req.body;
+            const { name, serialNumber, procurementYear, qty, description, subCategoryId } = req.body;
             const data = {
                 name, 
                 serialNumber, 
                 procurementYear,
-                condition,
                 qty,
                 description,
-                SubCategoryId
+                subCategoryId
             }
             await Item.create(data);
             res.status(200).json({
-                'status' : "SuccesS"
+                'status' : "Success Add"
             })
         } catch (error) {
             res.status(400).json({
@@ -53,19 +53,9 @@ module.exports = {
                 subCategoryId,
                 updatedAt : new Date()
             }
-            // const updatedAt = new Date()
-            const item =  await Item.findByIdAndUpdate(id, data)
-            // item.name = name;
-            // item.serialNumber = serialNumber,
-            // item.procurementYear = procurementYear,
-            // item.condition = condition,
-            // item.qty = qty,
-            // item.description = description,
-            // item.subCategoryId = subCategoryId,
-            // item.updatedAt = updatedAt
-            await item.save();
+            await Item.findByIdAndUpdate(id, data)
             res.status(200).json({
-                'status' : "SuccesS Edit"
+                'status' : "Success Edit"
             })
         } catch (error) {
             console.log(error)
@@ -79,6 +69,9 @@ module.exports = {
         try {
             const { id } = req.params;
             await Item.deleteOne({ "_id": id })
+            res.status(200).json({
+                'status': "Success Delete"
+            })
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",

@@ -6,10 +6,6 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subCategoryId: [{
-        type: ObjectId,
-        ref: 'SubCategory'
-    }],
     createdAt: {
         type: Date,
         default: Date.now 
