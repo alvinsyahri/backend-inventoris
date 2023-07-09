@@ -16,7 +16,7 @@ const itemSchema = new mongoose.Schema({
     },
     condition: {
         type: String,
-        default: "Baru" 
+        default: "New" 
     },
     qty: {
         type: Number,

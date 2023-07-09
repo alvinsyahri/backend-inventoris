@@ -6,6 +6,7 @@ module.exports = {
 
     viewCategory : async(req, res) => {
         try {
+            const category = await Category.find()
             const subCategory = await SubCategory.find()
             .sort({ createdAt: -1 })
             .populate(
@@ -17,6 +18,7 @@ module.exports = {
             res.status(200).json({
                 'status' : "Success",
                 'data' : subCategory,
+                'category' : category,
                 'valid': true,
                 'username': req.username
             });
@@ -30,10 +32,10 @@ module.exports = {
     },
     addCategory : async(req, res) => {
         try {
-            const { name, categoryId } = req.body;
+            const { categoryId, name  } = req.body;
             const data = {
-                name,
-                categoryId
+                categoryId,
+                name
             }
             console.log(req.body)
             await SubCategory.create(data)  
