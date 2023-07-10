@@ -15,8 +15,8 @@ const itemSchema = new mongoose.Schema({
        required: true 
     },
     condition: {
-        type: String,
-        default: "New" 
+        type: Number,
+        default: 0 
     },
     qty: {
         type: Number,
