@@ -1,3 +1,4 @@
+
 const Item = require('../../model/Item');
 const Loan = require('../../model/Loan');
 const User = require('../../model/User');
@@ -43,7 +44,7 @@ module.exports = {
     },
     addPeminjaman : async(req, res) => {
         try {
-            const { userId, itemId, description, qty } = req.body;
+            const { userId, itemId, qty, description } = req.body;
             const jumlah = qty ? qty: 1    
             const data = {
                 userId,
@@ -62,7 +63,7 @@ module.exports = {
                     const text = `Loan Data: %0A - User Name: ${user.name} %0A - Name of Goods: ${item.name} %0A - Loan Date: ${getDate(new Date())} %0A - Description: ${description}`
                     await axios.get(`https://api.telegram.org/bot6390829982:AAGD5YB4WrQhMoVbXCLdYSDokCT2BgZPfwI/sendMessage?chat_id=-953171747&text=${text}`)
                     res.status(200).json({
-                        'status' : "Success",
+                        'status' : "Success Add",
                     })
                 }else{
                     res.status(400).json({
@@ -84,33 +85,34 @@ module.exports = {
     editPeminjaman : async(req, res) => {
         try {
             const { id } = req.params
-            const { userId, itemId, description, qty } = req.body;
+            const { userId, itemId,  qty, description } = req.body;
             const jumlah = qty ? qty: 1    
             const data = {
                 userId,
                 itemId,
-                description,
                 qty: jumlah,
+                description,
                 updatedAt: new Date()
             };
-            const loan = await Loan.findOne({ _id: id}).populate({ path: 'itemId', populate: { path: 'subCategory', populate: { path: 'categoryId' } }})
-            const item = await Item.findOne({ _id: itemId}).populate({ path: 'subCategory', populate: { path: 'categoryId' } });
-            if(loan.itemId.subCategoryId.categoryId._id === item.subCategoryId.categoryId._id){
-                
-            }
-            item.qty = (loan.qty + item.qty)
-            item.save()
+            const loan = await Loan.findOne({ _id: id})
+            const item = await Item.findOne({ _id: itemId});
+            const changeItemQty = await Item.findOne({ _id: loan.itemId});
+            
             if(item.qty > 0){
-                console.log(jumlah <= item.qty)
+                changeItemQty.qty = (loan.qty + changeItemQty.qty)
+                changeItemQty.save()
+                // console.log(jumlah <= item.qty)
                 if(jumlah <= item.qty){
                     await Loan.findByIdAndUpdate(id, data)
-                    const item = await Item.findOne({ _id: loan.itemId})
+                    const item = await Item.findOne({ _id: itemId})
                     item.qty = (item.qty - qty);
                     item.save();
                     res.status(200).json({
                         'status' : "Success Edit"
                     })
                 }else{
+                    changeItemQty.qty = (loan.qty - changeItemQty.qty)
+                    changeItemQty.save()
                     res.status(400).json({
                         'status' : "stok tidak mencukupi"
                     })
@@ -130,15 +132,20 @@ module.exports = {
     checkPeminjaman: async(req, res) => {
         try {
             const { id } = req.params
+            const { description, condition } = req.body
             const user = await User.findOne({ _id: req.username.id})
-            const loan =  await Loan.findOne({ _id: id})
-            loan.status = false
-            loan.tanggalKembali = new Date()
-            loan.save()
+            const dataLoan = {
+                status: false,
+                returnDate: new Date() 
+            }
+            const loan =  await Loan.findByIdAndUpdate(id, dataLoan)
             const item = await Item.findOne({ _id: loan.barangId})
-            item.status = false;
+            item.qty = (item.qty + loan.qty);
+            item.description = description
+            item.condition = condition
             item.save();
-            const text = `Return Date: %0A - User Name: ${user.name} %0A - Name of Goods: ${barang.name} %0A - Loan Date: ${getDate(peminjaman.tanggalPinjam)} %0A - Return Date: ${getDate(new Date())}`
+
+            const text = `Return Date: %0A - User Name: ${user.name} %0A - Name of Goods: ${item.name} %0A - Loan Date: ${getDate(loan.loanDate)} %0A - Return Date: ${getDate(new Date())}`
             await axios.get(`https://api.telegram.org/bot6390829982:AAGD5YB4WrQhMoVbXCLdYSDokCT2BgZPfwI/sendMessage?chat_id=-953171747&text=${text}`)
             
             res.status(200).json({
