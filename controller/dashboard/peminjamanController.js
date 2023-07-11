@@ -96,7 +96,7 @@ module.exports = {
       const loan = await Loan.findOne({ _id: id });
       const item = await Item.findOne({ _id: itemId });
 
-      if (item.qty > 0) {
+      if (item.qty >= 0) {
         await Item.findByIdAndUpdate(loan.itemId, { $inc: { qty: loan.qty } })
         const checkItem = await Item.findOne({ _id:itemId })
         if (qty <= checkItem.qty) {
