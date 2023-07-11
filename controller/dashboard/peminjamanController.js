@@ -86,32 +86,28 @@ module.exports = {
     try {
       const { id } = req.params;
       const { userId, itemId, qty, description } = req.body;
-      const jumlah = qty ? qty : 1;
       const data = {
         userId,
         itemId,
-        qty: jumlah,
+        qty,
         description,
         updatedAt: new Date(),
       };
       const loan = await Loan.findOne({ _id: id });
       const item = await Item.findOne({ _id: itemId });
-      const changeItemQty = await Item.findOne({ _id: loan.itemId });
 
       if (item.qty > 0) {
-        changeItemQty.qty = loan.qty + changeItemQty.qty;
-        changeItemQty.save();
-        if (jumlah <= item.qty) {
+        await Item.findByIdAndUpdate(loan.itemId, { $inc: { qty: loan.qty } })
+        const checkItem = await Item.findOne({ _id:itemId })
+        if (qty <= checkItem.qty) {
           await Loan.findByIdAndUpdate(id, data);
-          const item = await Item.findOne({ _id: itemId });
-          item.qty = item.qty - qty;
-          item.save();
+          checkItem.qty -= qty;
+          checkItem.save();
           res.status(200).json({
             status: "Success Edit",
           });
         } else {
-          changeItemQty.qty = loan.qty - changeItemQty.qty;
-          changeItemQty.save();
+          await Item.findByIdAndUpdate(loan.itemId, { $inc: { qty: -loan.qty } })
           res.status(400).json({
             status: "stok tidak mencukupi",
           });
@@ -121,6 +117,7 @@ module.exports = {
           status: "barang sedang dipinjam",
         });
       }
+
     } catch (error) {
       res.status(400).json({
         status: "Error",
