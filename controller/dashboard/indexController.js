@@ -4,8 +4,7 @@ module.exports = {
 
     viewDashboard : async(req, res) => {
         try {
-            const data = await Item.find()
-            .sort({ condition: -1 })
+            const data = await Item.find({ condition: { $in: [2, 3] } })
             .populate({
                 path: 'subCategoryId',
                 select: 'name',
