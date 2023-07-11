@@ -8,7 +8,7 @@ const loanSchema = new mongoose.Schema({
     },
     returnDate: {
         type: Date,
-        default: ""
+        default: 0
     },
     description: {
         type: String,
