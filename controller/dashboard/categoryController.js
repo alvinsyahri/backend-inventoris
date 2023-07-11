@@ -37,7 +37,6 @@ module.exports = {
                 categoryId,
                 name
             }
-            console.log(req.body)
             await SubCategory.create(data)  
             res.status(200).json({
                 'status' : "Success Add",

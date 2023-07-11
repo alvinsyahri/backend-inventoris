@@ -101,7 +101,6 @@ module.exports = {
             if(item.qty > 0){
                 changeItemQty.qty = (loan.qty + changeItemQty.qty)
                 changeItemQty.save()
-                // console.log(jumlah <= item.qty)
                 if(jumlah <= item.qty){
                     await Loan.findByIdAndUpdate(id, data)
                     const item = await Item.findOne({ _id: itemId})

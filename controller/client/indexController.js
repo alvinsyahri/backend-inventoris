@@ -5,14 +5,27 @@ module.exports = {
         try {
             const loan = await Loan.find({ "userId": req.username.id })
             .sort({ createdAt: -1 })
-            .populate({
-                path: 'barangId',
-                select: 'kode',
-            })
-            .populate({
-                path: 'userId',
-                select: 'name'
-            });
+            .populate(
+                {
+                    path: 'itemId',
+                    select: 'name serialNumber procurementYear condition qty description',
+                    populate: {
+                        path: 'subCategoryId',
+                        select: 'name',
+                        populate: {
+                            path: 'categoryId',
+                            select: 'name'
+                        }
+                    }
+
+                }
+            )
+            .populate(
+                {
+                    path: 'userId',
+                    select: 'name'
+                }
+            );
             res.status(200).json({
                 'data' : loan
             })

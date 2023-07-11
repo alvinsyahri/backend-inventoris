@@ -2,12 +2,8 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
 const historyItemSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
     qty: {
-        type: Integer,
+        type: Number,
         required: true
     },
     itemId: {
