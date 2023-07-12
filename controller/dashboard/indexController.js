@@ -1,4 +1,5 @@
 const Item = require('../../model/Item')
+const User = require('../../model/User')
 
 module.exports = {
 
@@ -14,14 +15,14 @@ module.exports = {
                 }
             })
             let card = []
-            card.push(await Item.countDocuments({ qty: { $gt: 1 }}))
+            card.push(await Item.countDocuments({ qty: { $in: [1, 1000] }}))
             card.push(await Item.countDocuments({ qty: 0}))
             res.status(200).json({
                 'status' : "Success",
                 'valid': true,
                 'username': req.username,
                 'data': data,
-                'card': card
+                'card': card 
             });
         } catch (error) {
             res.status(400).json({
