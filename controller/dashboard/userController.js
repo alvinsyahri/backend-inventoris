@@ -1,4 +1,5 @@
 const User = require('../../model/User')
+const Loan = require('../../model/Loan')
 
 module.exports = {
     viewUser : async(req, res) => {
@@ -26,7 +27,7 @@ module.exports = {
             }
             await User.create(data)
             res.status(200).json({
-                'status' : "SuccesS"
+                'status' : "Success Add"
             })
         } catch (error) {
             res.status(400).json({
@@ -49,7 +50,7 @@ module.exports = {
             const user =  await User.findByIdAndUpdate(id, data)
             await user.save();
             res.status(200).json({
-                'status' : "SuccesS Edit"
+                'status' : "Success Edit"
             })
         } catch (error) {
             res.status(400).json({
@@ -61,11 +62,18 @@ module.exports = {
     deleteUser : async(req, res) => {
         try {
             const { id } = req.params;
-            const user = await User.findOne({ _id: id });
-            await user.deleteOne();
-            res.status(200).json({
-                'status' : "SuccesS Edit"
-            })
+            const loan = await Loan.find({ 'userId': id })
+            if(loan.length > 0){
+                res.status(400).json({
+                    'status' : "User tidak bisa dihapus karena masih dipakai",
+                }) 
+            }else{
+                const user = await User.findOne({ _id: id });
+                await user.deleteOne();
+                res.status(200).json({
+                    'status' : "Success Edit"
+                })
+            }
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",

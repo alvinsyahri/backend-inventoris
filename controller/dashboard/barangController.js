@@ -1,5 +1,6 @@
 const Item = require('../../model/Item');
 const Category = require('../../model/Category');
+const Loan = require('../../model/Loan')
 
 module.exports = {
 
@@ -79,10 +80,17 @@ module.exports = {
     deleteBarang : async(req, res) => {
         try {
             const { id } = req.params;
-            await Item.deleteOne({ "_id": id })
-            res.status(200).json({
-                'status': "Success Delete"
-            })
+            const loan = await Loan.find({ 'itemId': id })
+            if(loan.length > 0){
+                res.status(400).json({
+                    'status' : "Barang tidak bisa dihapus karena masih dipakai",
+                })
+            }else{
+                await Item.deleteOne({ "_id": id })
+                res.status(200).json({
+                    'status': "Success Delete"
+                })
+            }
         } catch (error) {
             res.status(400).json({
                 'status' : "Error",

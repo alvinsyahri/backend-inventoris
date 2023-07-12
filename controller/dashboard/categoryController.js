@@ -78,7 +78,7 @@ module.exports = {
             const item = await Item.find({ "subCategoryId": id})
             if(item.length > 0){
                 res.status(400).json({
-                    'status' : "Barang tidak bisa dihapus karena masih dipakai",
+                    'status' : "Category tidak bisa dihapus karena masih dipakai",
                 })
             }else{
                 await SubCategory.deleteOne({ _id: id})
