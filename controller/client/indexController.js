@@ -8,6 +8,8 @@ const axios = require("axios");
 module.exports = {
     viewPeminjaman : async(req, res) => {
         try {
+            const data = await Item.find({"qty" : { $gt: 0}})
+            const datas = await Item.find();
             const loan = await Loan.find({ "userId": req.username.id, "status": true })
             .sort({ createdAt: -1 })
             .populate(
@@ -32,7 +34,9 @@ module.exports = {
                 }
             );
             res.status(200).json({
-                'data' : loan
+                'data' : loan,
+                'item' : data,
+                'datas' : datas
             })
         } catch (error) {
             res.status(400).json({

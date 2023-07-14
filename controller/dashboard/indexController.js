@@ -15,7 +15,7 @@ module.exports = {
                 }
             })
             let card = []
-            card.push(await Item.countDocuments({ qty: { $in: [1, 1000] }}))
+            card.push(await Item.countDocuments({ qty: { $gt: 0} }))
             card.push(await Item.countDocuments({ qty: 0}))
             card.push(await Item.countDocuments({ condition: { $in: [2, 3] } }))
             res.status(200).json({
